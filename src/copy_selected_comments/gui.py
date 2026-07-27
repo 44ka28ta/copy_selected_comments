@@ -12,6 +12,8 @@ class ClipboardSelector:
 		self.root = root
 		self.root.title("Clipboard Item Selector")
 		self.root.geometry("600x500")
+		self.root.bind("<Control-c>", self.copy_selected)
+		self.root.bind("<Control-C>", self.copy_selected)
 
 		self.items = []
 		self.variables = []
@@ -111,7 +113,7 @@ class ClipboardSelector:
 
 		self.status_label.config( text="Selection cleared")
 
-	def copy_selected(self):
+	def copy_selected(self, event=None):
 
 		selected_items = [ item for item, var in zip( self.items, self.variables) if var.get() ]
 
@@ -119,7 +121,7 @@ class ClipboardSelector:
 			messagebox.showwarning( "Warning", "Please select at least one item.")
 			return
 
-		pyperclip.copy( "\n".join(f"* {item}" for item in selected_items))
+		pyperclip.copy( "\n".join(selected_items))
 
 		self.status_label.config( text=f"Copied {len(selected_items)} items to clipboard")
 
