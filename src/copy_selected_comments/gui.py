@@ -1,0 +1,138 @@
+
+#!/usr/bin/env python3
+
+import tkinter as tk
+from tkinter import filedialog, messagebox
+import pyperclip
+
+
+class ClipboardSelector:
+
+	def __init__(self, root):
+		self.root = root
+		self.root.title("Clipboard Item Selector")
+		self.root.geometry("600x500")
+
+		self.items = []
+		self.variables = []
+
+		self.create_widgets()
+
+	def create_widgets(self):
+
+		# Top area
+		top_frame = tk.Frame(self.root)
+		top_frame.pack(fill="x", padx=10, pady=5)
+
+		tk.Button( top_frame, text="Open Text File", command=self.load_file).pack(side="left")
+
+		self.file_label = tk.Label( top_frame, text="No file loaded", anchor="w")
+		self.file_label.pack(side="left", padx=10)
+
+		# Action buttons
+		action_frame = tk.Frame(self.root)
+		action_frame.pack(fill="x", padx=10, pady=5)
+
+		tk.Button(action_frame, text="Select All", command=self.select_all).pack(side="left", padx=2)
+
+		tk.Button( action_frame, text="Clear All", command=self.clear_all).pack(side="left", padx=2)
+
+		tk.Button( action_frame, text="Copy Selected", command=self.copy_selected).pack(side="left", padx=20)
+
+		# Scrollable checkbox area
+		container = tk.Frame(self.root)
+		container.pack(fill="both", expand=True, padx=10, pady=10)
+
+		self.canvas = tk.Canvas(container)
+		scrollbar = tk.Scrollbar( container, orient="vertical", command=self.canvas.yview)
+
+		self.checkbox_frame = tk.Frame(self.canvas)
+
+		self.checkbox_frame.bind( "<Configure>", lambda e: self.canvas.configure( scrollregion=self.canvas.bbox("all")))
+
+		self.canvas.create_window( (0, 0), window=self.checkbox_frame, anchor="nw")
+
+		self.canvas.configure( yscrollcommand=scrollbar.set)
+		self.canvas.pack( side="left", fill="both", expand=True)
+
+		scrollbar.pack( side="right", fill="y")
+
+		self.status_label = tk.Label( self.root, text="Ready")
+		self.status_label.pack(fill="x", pady=5)
+
+	def load_file(self):
+
+		filename = filedialog.askopenfilename( title="Select Text File", filetypes=[ ("Text Files", "*.txt"), ("All Files", "*.*") ])
+
+		if not filename:
+			return
+
+		try:
+			with open(filename, "r", encoding="utf-8") as f:
+				items = [ line.strip() for line in f if line.strip() and not line.strip().startswith("#") ]
+
+			self.populate_items(items)
+
+			self.file_label.config( text=f"Loaded: {filename}")
+
+			self.status_label.config( text=f"{len(items)} items loaded")
+
+		except Exception as e:
+			messagebox.showerror( "Error", f"Failed to load file:\n{e}")
+
+	def populate_items(self, items):
+
+		for widget in self.checkbox_frame.winfo_children():
+			widget.destroy()
+
+		self.items = items
+		self.variables = []
+
+		for item in items:
+			var = tk.BooleanVar()
+
+			chk = tk.Checkbutton( self.checkbox_frame, text=item, variable=var, anchor="w", justify="left")
+
+			chk.pack( fill="x", anchor="w")
+
+			self.variables.append(var)
+
+	def select_all(self):
+
+		for var in self.variables:
+			var.set(True)
+
+		self.status_label.config( text="All items selected")
+
+	def clear_all(self):
+
+		for var in self.variables:
+			var.set(False)
+
+		self.status_label.config( text="Selection cleared")
+
+	def copy_selected(self):
+
+		selected_items = [ item for item, var in zip( self.items, self.variables) if var.get() ]
+
+		if not selected_items:
+			messagebox.showwarning( "Warning", "Please select at least one item.")
+			return
+
+		pyperclip.copy( "\n".join(f"* {item}" for item in selected_items))
+
+		self.status_label.config( text=f"Copied {len(selected_items)} items to clipboard")
+
+
+def main():
+
+	root = tk.Tk()
+
+	app = ClipboardSelector(root)
+
+	root.mainloop()
+
+
+if __name__ == "__main__":
+	main()
+

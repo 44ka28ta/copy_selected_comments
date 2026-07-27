@@ -1,0 +1,9 @@
+[project]
+name = "copy_selected_comments"
+version = "0.1.0"
+dependencies = [ "pyperclip" ]
+readme = "README.md"
+requires-python = ">=3.11"
+
+[project.scripts]
+copy_selected_comments = "copy_selected_comments.gui:main"
