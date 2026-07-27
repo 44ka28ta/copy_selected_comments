@@ -39,7 +39,7 @@ class ClipboardSelector:
 
 		tk.Button( action_frame, text="Clear All", command=self.clear_all).pack(side="left", padx=2)
 
-		tk.Button( action_frame, text="Copy Selected", command=self.copy_selected).pack(side="left", padx=20)
+		tk.Button( action_frame, text="Copy Selected (Ctrl+C)", command=self.copy_selected).pack(side="left", padx=20)
 
 		# Scrollable checkbox area
 		container = tk.Frame(self.root)
