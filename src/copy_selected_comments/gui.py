@@ -62,6 +62,16 @@ class ClipboardSelector:
 		self.status_label = tk.Label( self.root, text="Ready")
 		self.status_label.pack(fill="x", pady=5)
 
+
+        # Mouse wheel support
+		self.canvas.bind_all("<MouseWheel>", self.on_mousewheel)      # Windows
+
+
+		self.canvas.bind( "<Enter>", lambda e: self.canvas.focus_set())
+		self.canvas.bind_all("<Button-4>", self.on_mousewheel_linux)  # Linux scroll up
+		self.canvas.bind_all("<Button-5>", self.on_mousewheel_linux)  # Linux scroll down
+
+
 	def load_file(self):
 
 		filename = filedialog.askopenfilename( title="Select Text File", filetypes=[ ("Text Files", "*.txt"), ("All Files", "*.*") ])
@@ -124,6 +134,16 @@ class ClipboardSelector:
 		pyperclip.copy( "\n".join(selected_items))
 
 		self.status_label.config( text=f"Copied {len(selected_items)} items to clipboard")
+
+	def on_mousewheel(self, event):
+		self.canvas.yview_scroll( int(-1 * (event.delta / 120)), "units")
+
+
+	def on_mousewheel_linux(self, event):
+		if event.num == 4:
+			self.canvas.yview_scroll(-1, "units")
+		elif event.num == 5:
+			self.canvas.yview_scroll(1, "units")
 
 
 def main():
