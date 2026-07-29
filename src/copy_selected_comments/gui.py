@@ -15,8 +15,11 @@ class ClipboardSelector:
 		self.root.bind("<Control-c>", self.copy_selected)
 		self.root.bind("<Control-C>", self.copy_selected)
 
+		self.root.bind("<F5>", lambda e: self.reload_file())
+
 		self.items = []
 		self.variables = []
+		self.current_file = None
 
 		self.create_widgets()
 
@@ -27,6 +30,8 @@ class ClipboardSelector:
 		top_frame.pack(fill="x", padx=10, pady=5)
 
 		tk.Button( top_frame, text="Open Text File", command=self.load_file).pack(side="left")
+
+		tk.Button(top_frame, text="Reload", command=self.reload_file ).pack(side="left", padx=5)
 
 		self.file_label = tk.Label( top_frame, text="No file loaded", anchor="w")
 		self.file_label.pack(side="left", padx=10)
@@ -71,6 +76,16 @@ class ClipboardSelector:
 		self.canvas.bind_all("<Button-4>", self.on_mousewheel_linux)  # Linux scroll up
 		self.canvas.bind_all("<Button-5>", self.on_mousewheel_linux)  # Linux scroll down
 
+	def load_file_contents(self, filename):
+
+		with open(filename, "r", encoding="utf-8") as f:
+			items = [ line.strip() for line in f if line.strip() and not line.strip().startswith("#") ]
+
+		self.populate_items(items)
+
+		self.file_label.config( text=f"Loaded: {filename}")
+
+		self.status_label.config( text=f"{len(items)} items loaded")
 
 	def load_file(self):
 
@@ -80,14 +95,8 @@ class ClipboardSelector:
 			return
 
 		try:
-			with open(filename, "r", encoding="utf-8") as f:
-				items = [ line.strip() for line in f if line.strip() and not line.strip().startswith("#") ]
-
-			self.populate_items(items)
-
-			self.file_label.config( text=f"Loaded: {filename}")
-
-			self.status_label.config( text=f"{len(items)} items loaded")
+			self.current_file = filename
+			self.load_file_contents(filename)
 
 		except Exception as e:
 			messagebox.showerror( "Error", f"Failed to load file:\n{e}")
@@ -108,6 +117,20 @@ class ClipboardSelector:
 			chk.pack( fill="x", anchor="w")
 
 			self.variables.append(var)
+
+	def reload_file(self):
+
+		if not self.current_file:
+			messagebox.showwarning( "Warning", "No file loaded.")
+			return
+
+		try:
+			self.load_file_contents( self.current_file)
+
+			self.status_label.config( text="File reloaded")
+
+		except Exception as e:
+			messagebox.showerror( "Error", f"Failed to reload file:\n{e}")
 
 	def select_all(self):
 
