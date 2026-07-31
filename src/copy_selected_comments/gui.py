@@ -8,6 +8,7 @@ import time
 import pyautogui
 from pathlib import Path
 import os
+import pywinctl as pwc
 
 
 class ClipboardSelector:
@@ -83,6 +84,8 @@ class ClipboardSelector:
 		self.canvas.bind_all("<Button-5>", self.on_mousewheel_linux)  # Linux scroll down
 
 		tk.Button(action_frame, text="Send To Teams", command=self.send_to_teams).pack(side="left", padx=5)
+
+		tk.Button(action_frame, text="Back in Teams", command=self.back_student).pack(side="left", padx=5)
 
 	def load_file_contents(self, filename):
 
@@ -194,31 +197,66 @@ class ClipboardSelector:
 		# Give user time to activate Teams
 		self.root.after(100, lambda: self.perform_teams_actions())
 
+	def back_student(self):
+
+		# Give user time to activate Teams
+		self.root.after(100, lambda: self.back_student_action())
 
 	def perform_teams_actions(self):
 
+		windows = list(filter(lambda x: "Microsoft Teams" in x.title, pwc.getAllWindows()))
+		
+		rightsidex = windows[0].right
+		rightsidey = windows[0].top
+
+
 		# Switch to Teams manually before calling if desired
 		time.sleep(0.5)
+
+		feedback_marginx = 360
+		feedback_marginy = 800
+
+		pyautogui.click(rightsidex - feedback_marginx, rightsidey + feedback_marginy)
+
+		# Clear feedback
+		pyautogui.hotkey("ctrl", "a")
+		pyautogui.press("delete")
 
 		# Paste feedback
 		pyautogui.hotkey("ctrl", "v")
 
 		time.sleep(0.5)
 
-		# Move to next field or button
-		location = pyautogui.locateCenterOnScreen(os.path.join(self.PROJECT_ROOT, "img", "next_student.png"), confidence=0.9)
 
-		if location:
-			pyautogui.click(location)
+		next_student_marginx = 60
+		next_student_marginy = 200
+		
+		pyautogui.click(rightsidex - next_student_marginx, rightsidey + next_student_marginy)
+		
 
 		time.sleep(0.2)
 
 		# Activate Next Student button
-		pyautogui.press("enter")
+		#pyautogui.press("enter")
 
 		self.status_label.config( text="Feedback pasted and next student selected")
 
+	def back_student_action(self):
 
+		windows = list(filter(lambda x: "Microsoft Teams" in x.title, pwc.getAllWindows()))
+		
+		rightsidex = windows[0].right
+		rightsidey = windows[0].top
+
+
+		time.sleep(0.5)
+
+
+		back_student_marginx = 350
+		back_student_marginy = 200
+		
+		pyautogui.click(rightsidex - back_student_marginx, rightsidey + back_student_marginy)
+		
 
 def main():
 
