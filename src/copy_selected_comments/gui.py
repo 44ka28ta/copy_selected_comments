@@ -25,7 +25,7 @@ class ClipboardSelector:
 		self.variables = []
 		self.current_file = None
 
-		self.PROJECT_ROOT = Path(__file__).resolve().parent.parent
+		self.PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 		self.create_widgets()
 
