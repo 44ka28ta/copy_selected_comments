@@ -7,6 +7,7 @@ import pyperclip
 import time
 import pyautogui
 from pathlib import Path
+import os
 
 
 class ClipboardSelector:
@@ -205,7 +206,7 @@ class ClipboardSelector:
 		time.sleep(0.5)
 
 		# Move to next field or button
-		location = pyautogui.locateCenterOnScreen(f"{self.PROJECT_ROOT}/img/next_student.png", confidence=0.9)
+		location = pyautogui.locateCenterOnScreen(os.path.join(self.PROJECT_ROOT, "img", "next_student.png"), confidence=0.9)
 
 		if location:
 			pyautogui.click(location)
