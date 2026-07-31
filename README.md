@@ -9,6 +9,15 @@ pip3 -m venv .venv
 pip3 install -r requirements.txt
 ```
 
+```bash
+zypper install xauth
+xauth add :0 MIT-MAGIC-COOKIE-1 $(openssl rand -hex 16)
+```
+
+```bash
+zypper install gnome-screenshot
+```
+
 ## Build
 
 ```bash
