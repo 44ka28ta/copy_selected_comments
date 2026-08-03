@@ -228,7 +228,7 @@ class ClipboardSelector:
 		time.sleep(0.5)
 
 
-		next_student_marginx = 60
+		next_student_marginx = 65
 		next_student_marginy = 200
 		
 		pyautogui.click(rightsidex - next_student_marginx, rightsidey + next_student_marginy)
